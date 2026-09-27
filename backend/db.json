@@ -1,0 +1,48 @@
+{
+  "taches": [
+    {
+      "titre": "Conception de l'interface utilisateur",
+      "etat": "termine",
+      "date_debut": "2026-09-10",
+      "date_fin": "2026-09-30",
+      "date_modification": "2026-09-25T10:25:43.148Z",
+      "id": "1"
+    },
+    {
+      "titre": "Éléments de wireframe",
+      "etat": "termine",
+      "date_debut": "2026-09-15",
+      "date_fin": "2026-10-05",
+      "date_modification": "2026-09-25T10:35:14.133Z",
+      "id": "2"
+    },
+    {
+      "id": "3",
+      "titre": "Page d'atterrissage",
+      "etat": "cree",
+      "date_debut": "2026-09-25",
+      "date_fin": "2026-10-15",
+      "date_creation": "2026-09-25T08:00:00",
+      "date_modification": "2026-09-25T08:00:00"
+    },
+    {
+      "id": "4",
+      "titre": "Maquette du tableau de bord",
+      "etat": "termine",
+      "date_debut": "2026-08-01",
+      "date_fin": "2026-08-17",
+      "date_creation": "2026-08-01T10:00:00",
+      "date_modification": "2026-08-17T16:00:00"
+    },
+    {
+      "id": "5",
+      "titre": "Refonte du logo",
+      "etat": "annule",
+      "date_debut": "2026-07-26",
+      "date_fin": "2026-08-10",
+      "date_creation": "2026-07-26T09:30:00",
+      "date_modification": "2026-08-02T09:00:00"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}

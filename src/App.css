@@ -1,0 +1,467 @@
+:root {
+  --ink: #1E1B33;
+  --muted: #8A8798;
+  --bg: #F6F5FA;
+  --card-bg: #FFFFFF;
+  --primary: #4C3BCF;
+  --primary-light: #EFEAFE;
+  --border: #ECEAF3;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  background: var(--card-bg);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ---- Par défaut : affichage PC — occupe toute la largeur de l'écran ---- */
+.app-shell {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--card-bg);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-container {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 56px 60px;
+  overflow-y: auto;
+}
+
+/* Barre du haut */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.topbar__actions { display: flex; gap: 10px; }
+
+.icon-btn {
+  border: none;
+  background: none;
+  font-size: 18px;
+  color: var(--ink);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.icon-btn:hover { background: var(--bg); }
+
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 27, 51, 0.35);
+  z-index: 30;
+  display: flex;
+}
+
+.drawer {
+  width: 260px;
+  max-width: 80vw;
+  height: 100%;
+  background: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 8px 0 24px rgba(30, 27, 51, 0.12);
+}
+
+.drawer__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.drawer__link {
+  border: none;
+  background: none;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.drawer__link:hover { background: var(--bg); }
+
+.drawer__link--active {
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.sort-menu { position: relative; }
+
+.sort-menu__list {
+  position: absolute;
+  right: 0;
+  top: 34px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(30, 27, 51, 0.12);
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  min-width: 190px;
+  z-index: 10;
+}
+
+.sort-menu__item {
+  width: 100%;
+  border: none;
+  background: none;
+  text-align: left;
+  padding: 9px 10px;
+  font-size: 13px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.sort-menu__item:hover { background: var(--bg); }
+
+.sort-menu__item--active {
+  color: var(--primary);
+  font-weight: 600;
+  background: var(--primary-light);
+}
+
+/* Salutation */
+.greeting {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 30px;
+}
+
+.greeting__avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.greeting h1 { font-size: 18px; font-weight: 400; margin: 0; }
+.greeting p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+
+.section-title { font-size: 26px; margin: 0 0 16px; }
+
+/* Onglets d'état */
+.tabs {
+  display: flex;
+  gap: 22px;
+  overflow-x: auto;
+  margin-bottom: 22px;
+  padding-bottom: 4px;
+}
+
+.tab {
+  border: none;
+  background: none;
+  font-size: 14px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px 0;
+  white-space: nowrap;
+}
+
+.tab--active { color: var(--primary); font-weight: 600; }
+
+/* Cartes en avant : grille qui s'adapte à la largeur sur PC */
+.cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.task-card {
+  width: 100%;
+  min-height: 150px;
+  border: none;
+  border-radius: 18px;
+  padding: 16px;
+  color: white;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.task-card__badge {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.25);
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.task-card__title { font-size: 15px; margin: 10px 0; line-height: 1.3; }
+
+.task-card__progress-label { font-size: 11px; opacity: 0.9; }
+
+.task-card__bar {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  margin-top: 6px;
+}
+
+.task-card__bar-fill { height: 100%; background: white; border-radius: 4px; }
+
+/* Liste des tâches */
+.task-list { display: flex; flex-direction: column; gap: 10px; }
+
+.empty-state { color: var(--muted); font-size: 14px; text-align: center; padding: 30px 0; }
+
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.task-row__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.task-row__info { flex: 1; min-width: 0; }
+.task-row__title { margin: 0; font-size: 14px; font-weight: 600; }
+.task-row__date { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+
+.task-row__pill {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.task-row__menu { position: relative; }
+
+.task-row__menu-btn {
+  border: none;
+  background: none;
+  font-size: 18px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.task-row__menu-list {
+  position: absolute;
+  right: 0;
+  top: 26px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+}
+
+.task-row__menu-list button {
+  border: none;
+  background: none;
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.task-row__menu-list button:hover { background: var(--bg); }
+
+/* Navigation basse : sur PC, un simple bouton flottant en bas à droite */
+.bottom-nav {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+}
+
+.bottom-nav__add {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: 26px;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(76, 59, 207, 0.35);
+}
+
+/* Modale de formulaire */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 27, 51, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.modal-card {
+  background: white;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 20px;
+  padding: 24px;
+  max-height: 88vh;
+  overflow-y: auto;
+}
+
+.modal-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.modal-card__header h2 { font-size: 18px; margin: 0; }
+
+.modal-card__close {
+  border: none;
+  background: var(--bg);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.task-form { display: flex; flex-direction: column; gap: 14px; }
+
+.input-row { display: flex; gap: 12px; }
+.input-row .input-group { flex: 1; }
+
+.input-group { display: flex; flex-direction: column; gap: 6px; }
+
+.input-group label { font-size: 13px; color: var(--muted); }
+
+.input-group input,
+.input-group select {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  background: var(--bg);
+}
+
+.etat-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.etat-picker__btn {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.etat-picker__btn--active { font-weight: 600; }
+
+.date-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.date-shortcuts__btn {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 11px;
+  padding: 5px 9px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.date-shortcuts__btn:hover { background: var(--primary-light); color: var(--primary); }
+
+.form-actions { display: flex; gap: 10px; margin-top: 8px; }
+
+.btn {
+  flex: 1;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary { background: var(--primary); color: white; }
+.btn-secondary { background: var(--bg); color: var(--ink); }
+
+/* ---- Téléphone (petit écran) : on repasse en mode "app mobile plein écran" ---- */
+@media (max-width: 640px) {
+  .app-container { padding: 20px 20px 100px; max-width: 100%; }
+
+  .cards-row {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .task-card { flex: 0 0 auto; width: 160px; }
+
+  .bottom-nav {
+    position: sticky;
+    bottom: 0;
+    right: auto;
+    width: 100%;
+    justify-content: center;
+    background: white;
+    border-top: 1px solid var(--border);
+    padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .modal-overlay { align-items: flex-end; }
+
+  .modal-card {
+    max-width: 100%;
+    border-radius: 20px 20px 0 0;
+    padding: 22px 20px calc(22px + env(safe-area-inset-bottom, 0px));
+  }
+}
