@@ -35,13 +35,12 @@
       "date_modification": "2026-08-17T16:00:00"
     },
     {
-      "id": "5",
       "titre": "Refonte du logo",
-      "etat": "annule",
+      "etat": "termine",
       "date_debut": "2026-07-26",
       "date_fin": "2026-08-10",
-      "date_creation": "2026-07-26T09:30:00",
-      "date_modification": "2026-08-02T09:00:00"
+      "date_modification": "2026-10-02T08:03:16.409Z",
+      "id": "5"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
