@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ETATS, formatDate } from '../etats';
 
-export default function TaskListItem({ tache, onModifier, onSupprimer }) {
+export default function TaskListItem({ tache, onModifier, onSupprimer, onTerminer }) {
   const [menuOuvert, setMenuOuvert] = useState(false);
   const etat = ETATS[tache.etat];
 
@@ -33,6 +33,10 @@ export default function TaskListItem({ tache, onModifier, onSupprimer }) {
         </button>
         {menuOuvert && (
           <div className="task-row__menu-list">
+            {/* Raccourci : passe directement la tâche à l'état "Terminée". */}
+            {tache.etat !== 'termine' && onTerminer && (
+              <button onClick={() => { setMenuOuvert(false); onTerminer(tache.id); }}>Marquer terminée</button>
+            )}
             <button onClick={() => { setMenuOuvert(false); onModifier(tache); }}>Modifier</button>
             <button onClick={() => { setMenuOuvert(false); onSupprimer(tache.id); }}>Supprimer</button>
           </div>

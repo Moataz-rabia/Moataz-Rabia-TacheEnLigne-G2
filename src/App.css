@@ -6,6 +6,7 @@
   --primary: #4C3BCF;
   --primary-light: #EFEAFE;
   --border: #ECEAF3;
+  --error: #D0455C;
 }
 
 * { box-sizing: border-box; }
@@ -87,6 +88,13 @@ body {
   align-items: center;
   font-weight: 600;
   margin-bottom: 14px;
+}
+
+/* Groupe de filtres du menu latéral (garde le même espacement que le tiroir). */
+.drawer__group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .drawer__link {
@@ -237,6 +245,40 @@ body {
 .task-list { display: flex; flex-direction: column; gap: 10px; }
 
 .empty-state { color: var(--muted); font-size: 14px; text-align: center; padding: 30px 0; }
+
+/* État de chargement : petit cercle qui tourne pendant la lecture des tâches sur le serveur */
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 30px 0;
+}
+
+.loading-state::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--muted);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: chargement-rotation 0.8s linear infinite;
+}
+
+@keyframes chargement-rotation {
+  to { transform: rotate(360deg); }
+}
+
+/* Message d'erreur : affiché quand json-server est inaccessible.
+   Même mise en page que .loading-state, en rouge. */
+.error-state {
+  color: var(--error, #D0455C);
+  font-size: 14px;
+  text-align: center;
+  padding: 30px 0;
+}
 
 .task-row {
   display: flex;

@@ -5,8 +5,9 @@ import TaskListItem from './components/TaskListItem';
 import TaskForm from './components/TaskForm';
 import BottomNav from './components/BottomNav';
 import { ORDRE_ETATS, ETATS } from './etats';
-
-const API_URL = 'http://localhost:3000/taches';
+// Service de données : seules les fonctions de ce service parlent au backend
+// json-server (les composants n'appellent JAMAIS fetch directement).
+import apiService from './services';
 
 const FORM_VIDE = { titre: '', etat: 'cree', date_debut: '', date_fin: '' };
 
@@ -43,20 +44,45 @@ export default function App() {
   const [triOuvert, setTriOuvert] = useState(false);
   const [tri, setTri] = useState('echeance_asc');
   const [menuOuvert, setMenuOuvert] = useState(false);
+  // Vrai pendant la lecture des tâches : permet d'afficher un état de chargement.
+  const [chargement, setChargement] = useState(true);
+  // Message d'erreur affiché à l'écran si le backend est inaccessible.
+  const [erreur, setErreur] = useState(null);
 
-  const fetchTaches = async () => {
+  // Chargement initial des tâches via le service (aucun fetch dans les composants).
+  const chargerTaches = async () => {
     try {
-      const res = await fetch(API_URL);
-      const data = await res.json();
+      setErreur(null);
+      const data = await apiService.getAll();
       setTaches(data);
     } catch (err) {
+      // On affiche un message clair à l'écran (et on log l'erreur dans la console).
       console.error('Erreur lors du chargement des tâches:', err);
+      setErreur(err.message || 'Serveur inaccessible, lance json-server (npm run server).');
+    } finally {
+      // Dans tous les cas, on arrête l'indicateur de chargement.
+      setChargement(false);
     }
   };
 
   useEffect(() => {
-    fetchTaches();
+    // Un effet React ne peut pas être async lui-même : on déclare une petite
+    // fonction async à l'intérieur, puis on l'appelle (pattern recommandé par ESLint).
+    async function chargerAuDemarrage() {
+      await chargerTaches();
+    }
+    chargerAuDemarrage();
   }, []);
+
+  // La touche Échap ferme le menu latéral (comme pour la fenêtre de formulaire).
+  useEffect(() => {
+    if (!menuOuvert) return undefined;
+    const surEchap = (e) => {
+      if (e.key === 'Escape') setMenuOuvert(false);
+    };
+    window.addEventListener('keydown', surEchap);
+    return () => window.removeEventListener('keydown', surEchap);
+  }, [menuOuvert]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -79,22 +105,17 @@ export default function App() {
 
     try {
       if (modeEdition) {
-        await fetch(`${API_URL}/${idEnEdition}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+        // Modification : on n'envoie que les champs changés + l'id.
+        await apiService.update(idEnEdition, payload);
       } else {
-        await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+        // Création : le service génère l'id et ajoute la tâche au serveur.
+        await apiService.add(payload);
       }
       resetForm();
-      fetchTaches();
+      chargerTaches();
     } catch (err) {
       console.error('Erreur lors de la sauvegarde:', err);
+      setErreur(err.message || 'Serveur inaccessible, lance json-server (npm run server).');
     }
   };
 
@@ -113,10 +134,25 @@ export default function App() {
   const supprimerTache = async (id) => {
     if (!window.confirm('Supprimer cette tâche ?')) return;
     try {
-      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-      fetchTaches();
+      await apiService.remove(id);
+      chargerTaches();
     } catch (err) {
       console.error('Erreur lors de la suppression:', err);
+      setErreur(err.message || 'Serveur inaccessible, lance json-server (npm run server).');
+    }
+  };
+
+  // Raccourci « Marquer comme terminée » depuis le menu ⋮ d'une ligne.
+  const terminerTache = async (id) => {
+    try {
+      await apiService.update(id, {
+        etat: 'termine',
+        date_modification: new Date().toISOString()
+      });
+      chargerTaches();
+    } catch (err) {
+      console.error('Erreur lors du marquage comme terminée:', err);
+      setErreur(err.message || 'Serveur inaccessible, lance json-server (npm run server).');
     }
   };
 
@@ -178,11 +214,13 @@ export default function App() {
 
         <h2 className="section-title">Mes tâches</h2>
 
-        <div className="tabs">
+        <div className="tabs" role="group" aria-label="Filtrer les tâches par état">
           {ORDRE_ETATS.map((key) => (
             <button
               key={key}
               className={`tab ${filtre === key ? 'tab--active' : ''}`}
+              // aria-pressed indique quel filtre est actif (bouton à deux états).
+              aria-pressed={filtre === key}
               onClick={() => setFiltre(key)}
             >
               {ETATS[key].label}
@@ -190,7 +228,7 @@ export default function App() {
           ))}
         </div>
 
-        {tachesEnAvant.length > 0 && (
+        {!chargement && tachesEnAvant.length > 0 && (
           <div className="cards-row">
             {tachesEnAvant.map((t) => (
               <TaskCard key={t.id} tache={t} onClick={modifierTache} />
@@ -199,17 +237,28 @@ export default function App() {
         )}
 
         <div className="task-list">
-          {tachesFiltrees.length === 0 && (
-            <p className="empty-state">Aucune tâche dans cet état pour le moment.</p>
+          {chargement ? (
+            // État de chargement : affiché pendant la lecture des tâches sur le serveur.
+            <p className="loading-state" role="status">Chargement des tâches…</p>
+          ) : erreur ? (
+            // Message d'erreur : affiché si json-server est injoignable.
+            <p className="error-state" role="alert">{erreur}</p>
+          ) : (
+            <>
+              {tachesFiltrees.length === 0 && (
+                <p className="empty-state" role="status">Aucune tâche dans cet état pour le moment.</p>
+              )}
+              {tachesFiltrees.map((t) => (
+                <TaskListItem
+                  key={t.id}
+                  tache={t}
+                  onModifier={modifierTache}
+                  onSupprimer={supprimerTache}
+                  onTerminer={terminerTache}
+                />
+              ))}
+            </>
           )}
-          {tachesFiltrees.map((t) => (
-            <TaskListItem
-              key={t.id}
-              tache={t}
-              onModifier={modifierTache}
-              onSupprimer={supprimerTache}
-            />
-          ))}
         </div>
       </div>
 
@@ -217,28 +266,38 @@ export default function App() {
 
       {menuOuvert && (
         <div className="drawer-overlay" onClick={() => setMenuOuvert(false)}>
-          <nav className="drawer" onClick={(e) => e.stopPropagation()} aria-label="Menu principal">
+          <nav
+            className="drawer"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="drawer-title"
+          >
             <div className="drawer__header">
-              <span>Menu</span>
+              <span id="drawer-title">Menu</span>
               <button className="modal-card__close" onClick={() => setMenuOuvert(false)} aria-label="Fermer le menu">✕</button>
             </div>
 
-            <button
-              className={`drawer__link ${filtre === null ? 'drawer__link--active' : ''}`}
-              onClick={() => { setFiltre(null); setMenuOuvert(false); }}
-            >
-              Toutes les tâches
-            </button>
-
-            {ORDRE_ETATS.map((key) => (
+            <div className="drawer__group" role="group" aria-label="Filtrer les tâches par état">
               <button
-                key={key}
-                className={`drawer__link ${filtre === key ? 'drawer__link--active' : ''}`}
-                onClick={() => { setFiltre(key); setMenuOuvert(false); }}
+                className={`drawer__link ${filtre === null ? 'drawer__link--active' : ''}`}
+                aria-pressed={filtre === null}
+                onClick={() => { setFiltre(null); setMenuOuvert(false); }}
               >
-                {ETATS[key].label}
+                Toutes les tâches
               </button>
-            ))}
+
+              {ORDRE_ETATS.map((key) => (
+                <button
+                  key={key}
+                  className={`drawer__link ${filtre === key ? 'drawer__link--active' : ''}`}
+                  aria-pressed={filtre === key}
+                  onClick={() => { setFiltre(key); setMenuOuvert(false); }}
+                >
+                  {ETATS[key].label}
+                </button>
+              ))}
+            </div>
           </nav>
         </div>
       )}
